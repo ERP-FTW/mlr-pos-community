@@ -18,9 +18,9 @@ class BTCPayController(http.Controller):
     def btcpay_lightning_payment_link(self, **kw):
         try:
             btcpay_invoice = request.env['btcpay.server.instance'].search([('state', '=', 'active')], limit=1).action_create_invoice_lightning(kw) #calls function to create invoice and passes kw
-            btcpay_invoice_id = btcpay_invoice['id'] #retrieves invoice id
-            btcpay_payment_link = btcpay_invoice['BOLT11'] #retrieves invoice itself
-            invoiced_sat_amount = btcpay_invoice['invoiced_sat_amount'] #retrieves invoiced satoshi amount
+            btcpay_invoice_id = btcpay_invoice['data'].get('id') #retrieves invoice id
+            btcpay_payment_link = btcpay_invoice['data'].get('lightningInvoice') #retrieves invoice itself
+            invoiced_sat_amount = btcpay_invoice['data'].get('satsAmount') #retrieves invoiced satoshi amount
             conversion_rate = btcpay_invoice['conversion_rate'] #retrieves conversion rate of transaction
             print("For order: "+kw.get('uuid')+". Created Lightning invoice: " + btcpay_invoice_id)
             _logger.info("For order: "+kw.get('uuid')+". Created Lightning invoice: " + btcpay_invoice_id)
@@ -48,13 +48,19 @@ class BTCPayController(http.Controller):
     def btcpay_check_lightning_invoice(self, **kw):
         try:
             btcpay_invoice = request.env['btcpay.server.instance'].search([('state', '=', 'active')], limit=1).action_check_lightning_invoice(kw.get('invoice_id')) #calls function to get invoice status, should also check that invoice id is not blank
-            if btcpay_invoice['status'] == 'Paid':
+            if btcpay_invoice['status'] == 'paid':
                 _logger.info("Status of Lightning invoice: "+kw.get('invoice_id')+" is Paid. "+ btcpay_invoice['status'])
                 return json.dumps({
                     'error': False,
                     'invoice_status': btcpay_invoice['status']
                 })
-            elif btcpay_invoice['status'] == 'Unpaid':
+            elif btcpay_invoice['status'] == 'unpaid':
+                _logger.info("Status of Lightning invoice: "+kw.get('invoice_id')+" is Unpaid. "+ btcpay_invoice['status'])
+                return json.dumps({
+                    'error': True,
+                    'error_message': "Lightning: payment not made, check again in a minute. Invoice status is: " + btcpay_invoice['status']
+                })
+            elif btcpay_invoice['status'] == 'new':
                 _logger.info("Status of Lightning invoice: "+kw.get('invoice_id')+" is Unpaid. "+ btcpay_invoice['status'])
                 return json.dumps({
                     'error': True,
