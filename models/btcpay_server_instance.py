@@ -100,7 +100,9 @@ class BTCPayServerInstance(models.Model):
         self.state = 'inactive'
 
     def action_create_invoice_lightning(self, pos_payment_obj):  # creates lightning invoice
+        _logger.info('triggered action create invoice lightning')
         try:
+            _logger.info('tried action create invoice lightning')
             server_url = self.server_url + "/api/v1/store/" + self.store_id + "/invoice"
             headers = {"Authorization": "Bearer %s" % (self.api_key), "Content-Type": "application/json",
                        "Accept": "application/json"}
