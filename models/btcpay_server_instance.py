@@ -112,6 +112,8 @@ class BTCPayServerInstance(models.Model):
             }
             response = requests.post(server_url, data=json.dumps(payload), headers=headers)
             response_json = response.json()
+            _logger.info(response_json)
+            _logger.info(response.status_code)
             result = response_json if response.status_code == 201 else None
             conversion_rate = round(pos_payment_obj.get('amount') / (result['data'].get('satsAmount') / 100000000), 2)
             result.update({'invoiced_sat_amount': result['data'].get('satsAmount'),
