@@ -125,7 +125,9 @@ class BTCPayServerInstance(models.Model):
         try:
             _logger.info("Tried creating invoice")
             invoiced_info = self.get_amount_sats(pos_payment_obj) # gets the invoiced satoshi amount and conversion rate from get_amount_sats function
+            _logger.info(invoiced_info)
             amount_millisats = invoiced_info['invoiced_sat_amount'] * 1000 #converts sats to millisats as required by btcpayserver
+            _logger.info(amount_millisats)
             server_url = self.server_url + "/api/v1/stores/" + self.store_id + "/lightning/BTC/invoices"
             headers = {"Authorization": "Token %s" % (self.api_key), "Content-Type": "application/json"}
             lightning_expiration_minutes = self.expiration_minutes * 60 #conversion of expiration time from min to sec for submission to btcpay server
@@ -136,6 +138,7 @@ class BTCPayServerInstance(models.Model):
             }
             response = requests.post(server_url, data=json.dumps(payload), headers=headers)
             response_json = response.json()
+            _logger.info(response_json)
             result = response_json if response.status_code == 200 else None
             result.update(invoiced_info) #attach invoiced info (sat amount and conversion rate to API response
             return result #returns merged resuls
