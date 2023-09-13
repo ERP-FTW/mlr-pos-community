@@ -19,8 +19,8 @@ class BTCPayController(http.Controller):
         _logger.info("Triggered")
         try:
             _logger.info("Tried")
-            btcpay_invoice = http.request.env['btcpay.server.instance'].sudo().search([('state', '=', 'active')], limit=1).action_create_invoice_lightning(kw) #calls function to create invoice and passes kw
-            _logger.info(btcpay_invoice)
+            #btcpay_invoice = http.request.env['btcpay.server.instance'].sudo().search([('state', '=', 'active')], limit=1).action_create_invoice_lightning(kw) #calls function to create invoice and passes kw
+            _logger.info(http.request.env['btcpay.server.instance'].sudo().search([('state', '=', 'active')], limit=1).action_create_invoice_lightning(kw))
             btcpay_invoice_id = btcpay_invoice['id'] #retrieves invoice id
             btcpay_payment_link = btcpay_invoice['BOLT11'] #retrieves invoice itself
             invoiced_sat_amount = btcpay_invoice['invoiced_sat_amount'] #retrieves invoiced satoshi amount
