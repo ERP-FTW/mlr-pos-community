@@ -121,7 +121,9 @@ class BTCPayServerInstance(models.Model):
         self.state = 'inactive'
 
     def action_create_invoice_lightning(self, pos_payment_obj): #creates lightning invoice
+        _logger.info("Called creating invoice")
         try:
+            _logger.info("Tried creating invoice")
             invoiced_info = self.get_amount_sats(pos_payment_obj) # gets the invoiced satoshi amount and conversion rate from get_amount_sats function
             amount_millisats = invoiced_info['invoiced_sat_amount'] * 1000 #converts sats to millisats as required by btcpayserver
             server_url = self.server_url + "/api/v1/stores/" + self.store_id + "/lightning/BTC/invoices"
@@ -138,6 +140,7 @@ class BTCPayServerInstance(models.Model):
             result.update(invoiced_info) #attach invoiced info (sat amount and conversion rate to API response
             return result #returns merged resuls
         except Exception as e:
+            _logger.info("Exception creating invoice")
             raise UserError(_("Create BTCPay Lightning Invoice: %s", e.args))
 
 
