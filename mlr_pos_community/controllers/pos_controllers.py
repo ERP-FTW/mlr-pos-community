@@ -14,7 +14,7 @@ _logger = logging.getLogger(__name__)
 
 class BTCPayController(http.Controller):
     
-    @http.route('/btcpay/submitlightningorder', type='json', auth='user', csrf=False, methods=['POST']) #creates a lightning invoice based on current order
+    @http.route('/btcpay/submitlightningorder', type='json', auth='public', csrf=False, methods=['POST']) #creates a lightning invoice based on current order
     def btcpay_lightning_payment_link(self, **kw):
         try:
             btcpay_invoice = request.env['btcpay.server.instance'].search([('state', '=', 'active')], limit=1).action_create_invoice_lightning(kw) #calls function to create invoice and passes kw
@@ -36,6 +36,7 @@ class BTCPayController(http.Controller):
         except Exception as e: #error if invoice cannot be created
             _logger.info("Failed to create invoice.")
             try:
+                _logger.info("Failed order: " + kw.get('uuid'))
                 _logger.info("Failed order: " + kw.get('uuid'))
                 _logger.info("Response json: " + json.dumps(btcpay_invoice))
             finally:
