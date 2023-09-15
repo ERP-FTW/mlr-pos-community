@@ -19,6 +19,7 @@ class BTCPayController(http.Controller):
         _logger.info("Triggered")
         try:
             _logger.info("Tried")
+            _logger.info("Tried twice")
             _logger.info(kw)
             _logger.info(http.request.env['btcpay.server.instance'].sudo().search([('state', '=', 'active')],limit=1))
             btcpay_invoice = http.request.env['btcpay.server.instance'].sudo().search([('state', '=', 'active')], limit=1).action_create_invoice_lightning(kw) #calls function to create invoice and passes kw
